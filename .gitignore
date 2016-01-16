@@ -26,4 +26,5 @@ _testmain.go
 config.json*
 !config.json.template
 
-mail_currency
+mail_currency-*
+mail_currency.go
