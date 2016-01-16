@@ -23,5 +23,7 @@ _testmain.go
 *.test
 *.prof
 
-config.json
+config.json*
+!config.json.template
 
+mail_currency

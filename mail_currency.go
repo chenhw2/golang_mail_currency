@@ -63,13 +63,17 @@ func main() {
 		eachCurrency := regexp.MustCompile(`\s`).
 			ReplaceAllString(selEachCurrency.Text(), ``)
 		if matched, _ := regexp.MatchString(`\d+\.\d+\/\d+\.\d+.*`, eachCurrency); matched {
-			// fmt.Println(`    ** match a format`)
-			eachCurrency = regexp.MustCompile(`\d+\.\d+\/(\d+\.\d+)[^0-9]*(\d+)-(\d+).*`).
+			fmt.Println(`    ** match a format`)
+			fmt.Println(eachCurrency)
+			eachCurrency = regexp.MustCompile(`.*\/(\d+\.\d+).*`).
 				ReplaceAllString(eachCurrency, `$1`)
+			fmt.Println(eachCurrency)
 		} else {
-			// fmt.Println(`    ** not match the format`)
-			eachCurrency = regexp.MustCompile(`[^0-9]*(\d+\.\d+)[^0-9]*(\d+-\d+).*`).
+			fmt.Println(`    ** not match the format`)
+			fmt.Println(eachCurrency)
+			eachCurrency = regexp.MustCompile(`.*(\d+\.\d+).*`).
 				ReplaceAllString(eachCurrency, `$1`)
+			fmt.Println(eachCurrency)
 			f, err := strconv.ParseFloat(eachCurrency, 32)
 			checkError(err)
 			eachCurrency = strconv.FormatFloat(1/f, 'f', 4, 32)
