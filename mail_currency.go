@@ -87,7 +87,7 @@ func main() {
 	for _, email := range cfg.Emails {
 		fmt.Println(email.Addr)
 		fmt.Println(" *** send email")
-		for i := 0; i < 3; i++ {
+		for i := 0; i < 10; i++ {
 			err = sendToMail(
 				cfg.SMTPMail,     /*fromMail*/
 				"银联汇率",           /*fromName*/
