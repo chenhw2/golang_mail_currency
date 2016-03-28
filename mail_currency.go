@@ -79,7 +79,7 @@ func main() {
 			eachCurrency = strconv.FormatFloat(1/f, 'f', 4, 32)
 		}
 		eachCurrency = currency.Name + ": " + eachCurrency
-		mailBody += "\n" + eachCurrency
+		mailBody += "\r\n" + eachCurrency
 	}
 	fmt.Println("\n ** mailBody:\n" + mailBody)
 

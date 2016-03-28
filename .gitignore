@@ -27,4 +27,5 @@ config.json*
 !config.json.template
 
 mail_currency-*
+golang_mail_*
 mail_currency.go
