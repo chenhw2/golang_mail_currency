@@ -18,8 +18,8 @@ func sendToMail(fromMail, fromName, password, smtpServer, toMail, toName, subjec
 	auth := smtp.PlainAuth(toName, fromMail, password, hostAddress)
 
 	//from := mail.Address{strings.Split(fromMail, "@")[0], fromMail}
-	from := mail.Address{fromName, fromMail}
-	to := mail.Address{"", toMail}
+	from := mail.Address{Name: fromName, Address: fromMail}
+	to := mail.Address{Name: "", Address: toMail}
 
 	header := make(map[string]string)
 	header["From"] = from.String()

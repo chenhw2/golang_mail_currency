@@ -3,18 +3,20 @@ package main
 import (
 	"encoding/json"
 	"fmt"
-	goquery "github.com/PuerkitoBio/goquery"
 	"io/ioutil"
+	"log"
 	"os"
 	"path/filepath"
 	"regexp"
 	"strconv"
 	"time"
+
+	goquery "github.com/PuerkitoBio/goquery"
 )
 
 func checkError(err error) {
 	if err != nil {
-		panic(err)
+		log.Println(err)
 		os.Exit(1)
 	}
 }
@@ -30,13 +32,9 @@ type Currency struct {
 	Source string
 }
 
-type Email struct {
-	Addr string
-}
-
 type Config struct {
 	Currencys    []Currency
-	Emails       []Email
+	ToEmails     []string
 	SMTPServer   string
 	SMTPMail     string
 	SMTPPassword string
@@ -83,25 +81,26 @@ func main() {
 	}
 	fmt.Println("\n ** mailBody:\n" + mailBody)
 
-	fmt.Println("\n ** Emails:")
-	for _, email := range cfg.Emails {
-		fmt.Println(email.Addr)
-		fmt.Println(" *** send email")
+	fmt.Println("\n ** Sending Emails:")
+	for _, email := range cfg.ToEmails {
+		log.Println(email)
+		log.Println(" *** send email")
+		// continue
 		for i := 0; i < 10; i++ {
 			err = sendToMail(
 				cfg.SMTPMail,     /*fromMail*/
 				"银联汇率",           /*fromName*/
 				cfg.SMTPPassword, /*password*/
 				cfg.SMTPServer,   /*smtpServer*/
-				email.Addr,
+				email,
 				"",     /*toName*/
 				"常见币种", /*subject*/
 				mailBody)
 			if err == nil {
-				fmt.Println("Send mail success!")
+				log.Println("Send mail success!")
 				break
 			} else {
-				fmt.Printf("Send mail fail! Retry %d\n", i)
+				log.Printf("Send mail fail! Retry %d\n", i)
 			}
 		}
 		checkError(err)

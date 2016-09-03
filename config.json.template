@@ -25,13 +25,9 @@
             "Source":"http://www.kuaiyilicai.com/uprate/gbp.html"
         }
     ],
-    "Emails":[
-        {
-            "Addr":"test1@example.com"
-        },
-        {
-            "Addr":"test2@example.com"
-        }
+    "ToEmails":[
+        "test1@example.com",
+        "Addr":"test2@example.com"
     ],
     "SmtpServer":"smtp.example.com:25",
     "SmtpMail":"username@example.com",
