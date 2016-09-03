@@ -52,7 +52,7 @@ func main() {
 	cfgJSON, _ := ioutil.ReadAll(cfgFile)
 	json.Unmarshal(cfgJSON, &cfg)
 
-	log.Println("\n ** Currencys:")
+	log.Println("Currencys:")
 	for idx := range cfg.Currencys {
 		fmt.Println(cfg.Currencys[idx].Name + " | " + cfg.Currencys[idx].Source)
 		docEachCurrency, err := goquery.NewDocument(cfg.Currencys[idx].Source)
@@ -80,12 +80,12 @@ func main() {
 	for idx := range cfg.Currencys {
 		mailBody += fmt.Sprintf("\n%s: %.4f", cfg.Currencys[idx].Name, cfg.Currencys[idx].ValFromRMB)
 	}
-	log.Println(" ** mailBody:,", "\n", mailBody)
+	log.Println("MailBody:,", "\n", mailBody)
 
-	log.Println(" ** Sending Emails:")
+	log.Println("Sending Emails:")
 	for _, email := range cfg.ToEmails {
-		log.Print(email)
-		continue
+		// log.Print(email)
+		// continue
 		for i := 0; i < 10; i++ {
 			err = sendToMail(
 				cfg.SMTPMail,     /*fromMail*/
@@ -97,10 +97,11 @@ func main() {
 				"常见币种", /*subject*/
 				mailBody)
 			if err == nil {
-				log.Println(":", "Send mail success!")
+				log.Println(email, ":", "Send mail success!")
 				break
 			} else {
-				log.Println(":", "Send mail fail! Retry ", i)
+				log.Println(email, ":", "Send mail fail! Retry ", i)
+				time.Sleep(3 * time.Second)
 			}
 		}
 		checkError(err)
