@@ -16,7 +16,7 @@ import (
 
 func checkError(err error) {
 	if err != nil {
-		log.Println(err)
+		log.Fatalln(err)
 		os.Exit(1)
 	}
 }
@@ -28,8 +28,9 @@ func getCurrentDirectory() string {
 }
 
 type Currency struct {
-	Name   string
-	Source string
+	Name       string
+	Source     string
+	ValFromRMB float64
 }
 
 type Config struct {
@@ -51,41 +52,40 @@ func main() {
 	cfgJSON, _ := ioutil.ReadAll(cfgFile)
 	json.Unmarshal(cfgJSON, &cfg)
 
-	fmt.Println("\n ** Currencys:")
-	for _, currency := range cfg.Currencys {
-		fmt.Println(currency.Name + " | " + currency.Source)
-		docEachCurrency, err := goquery.NewDocument(currency.Source)
+	log.Println("\n ** Currencys:")
+	for idx := range cfg.Currencys {
+		fmt.Println(cfg.Currencys[idx].Name + " | " + cfg.Currencys[idx].Source)
+		docEachCurrency, err := goquery.NewDocument(cfg.Currencys[idx].Source)
 		checkError(err)
 		selEachCurrency := docEachCurrency.Find(`div.rate`).First()
 		//fmt.Println(selEachCurrency.Text())
 		eachCurrency := regexp.MustCompile(`\s`).
 			ReplaceAllString(selEachCurrency.Text(), ``)
 		if matched, _ := regexp.MatchString(`\d+\.\d+\/\d+\.\d+.*`, eachCurrency); matched {
-			fmt.Println(`    ** match a format`)
-			fmt.Println(eachCurrency)
-			eachCurrency = regexp.MustCompile(`.*\/(\d+\.\d+).*`).
-				ReplaceAllString(eachCurrency, `$1`)
-			fmt.Println(eachCurrency)
-		} else {
-			fmt.Println(`    ** not match the format`)
-			fmt.Println(eachCurrency)
-			eachCurrency = regexp.MustCompile(`.*(\d+\.\d+).*`).
-				ReplaceAllString(eachCurrency, `$1`)
-			fmt.Println(eachCurrency)
+			fmt.Println(`####`, `match the format`, ":   ", eachCurrency)
+			eachCurrency = regexp.MustCompile(`.*\/(\d+\.\d+).*`).ReplaceAllString(eachCurrency, `$1`)
 			f, err := strconv.ParseFloat(eachCurrency, 32)
 			checkError(err)
-			eachCurrency = strconv.FormatFloat(1/f, 'f', 4, 32)
+			cfg.Currencys[idx].ValFromRMB = f
+		} else {
+			fmt.Println(`#not`, `match the format`, ":   ", eachCurrency)
+			eachCurrency = regexp.MustCompile(`.*(\d+\.\d+).*`).ReplaceAllString(eachCurrency, `$1`)
+			f, err := strconv.ParseFloat(eachCurrency, 32)
+			checkError(err)
+			cfg.Currencys[idx].ValFromRMB = 1 / f
 		}
-		eachCurrency = currency.Name + ": " + eachCurrency
-		mailBody += "\n" + eachCurrency
+		fmt.Println(eachCurrency)
 	}
-	fmt.Println("\n ** mailBody:\n" + mailBody)
 
-	fmt.Println("\n ** Sending Emails:")
+	for idx := range cfg.Currencys {
+		mailBody += fmt.Sprintf("\n%s: %.4f", cfg.Currencys[idx].Name, cfg.Currencys[idx].ValFromRMB)
+	}
+	log.Println(" ** mailBody:,", "\n", mailBody)
+
+	log.Println(" ** Sending Emails:")
 	for _, email := range cfg.ToEmails {
-		log.Println(email)
-		log.Println(" *** send email")
-		// continue
+		log.Print(email)
+		continue
 		for i := 0; i < 10; i++ {
 			err = sendToMail(
 				cfg.SMTPMail,     /*fromMail*/
@@ -97,10 +97,10 @@ func main() {
 				"常见币种", /*subject*/
 				mailBody)
 			if err == nil {
-				log.Println("Send mail success!")
+				log.Println(":", "Send mail success!")
 				break
 			} else {
-				log.Printf("Send mail fail! Retry %d\n", i)
+				log.Println(":", "Send mail fail! Retry ", i)
 			}
 		}
 		checkError(err)
