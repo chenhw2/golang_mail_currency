@@ -25,10 +25,9 @@ _testmain.go
 *.prof
 *.upx
 
-config.json*
-!config.json.template
+*config.json*
+!template_config.json
 
 debug
 mail_currency-*
 golang_mail_*
-mail_currency.go
