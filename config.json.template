@@ -27,7 +27,9 @@
     ],
     "ToEmails":[
         "test1@example.com",
-        "Addr":"test2@example.com"
+        "test2@example.com",
+        "test3@example.com",
+        "test4@example.com"
     ],
     "SmtpServer":"smtp.example.com:25",
     "SmtpMail":"username@example.com",
