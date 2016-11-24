@@ -13,6 +13,7 @@ import (
 	"time"
 
 	goquery "github.com/PuerkitoBio/goquery"
+	cli "github.com/urfave/cli"
 )
 
 func checkError(err error, exit bool) {
@@ -48,9 +49,32 @@ var (
 	cfg     Config
 	err     error
 	isEmail = regexp.MustCompile(`^(\w)+(\.\w+)*@(\w)+((\.\w{2,3}){1,3})$`)
+	DRYRUN  = false
 )
 
+func init() {
+	app := cli.NewApp()
+	app.Name = "Mail Currencys"
+	app.Usage = "Mail UNpay Currencys"
+	app.Flags = []cli.Flag{
+		cli.BoolFlag{
+			Name:  "dryrun",
+			Usage: "Skip Sending Emails",
+		},
+	}
+	app.Action = func(c *cli.Context) error {
+		DRYRUN = c.Bool("dryrun")
+		return nil
+	}
+
+	app.Run(os.Args)
+}
+
 func main() {
+	if DRYRUN {
+		fmt.Println("!!! Dry Run Mode")
+	}
+
 	mailBody := time.Now().Format("060102")
 
 	cfgFile, err := os.Open(getCurrentDirectory() + `/config.json`)
@@ -102,6 +126,10 @@ func main() {
 
 	log.Println("Sending Emails:")
 	for _, v := range mails {
+		if DRYRUN {
+			fmt.Println(v)
+			continue
+		}
 		for i := 0; i < 5; i++ {
 			err = sendToMail(
 				cfg.SMTPMail,
